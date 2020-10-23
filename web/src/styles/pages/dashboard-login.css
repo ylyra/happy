@@ -1,0 +1,231 @@
+#page-dashboard {
+  display: flex;
+
+  width: 100vw;
+  height: 100vh;
+
+  background: #fff;
+}
+
+#page-dashboard .sidebar {
+  width: 920px;
+
+  background: linear-gradient(329.54deg, #29b6d1 0%, #00c7c7 100%);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+#page-dashboard .sidebar .location {
+  text-align: center;
+
+  font-size: 24px;
+  line-height: 34px;
+
+  display: flex;
+  flex-direction: column;
+
+  margin-top: 100px;
+}
+
+#page-dashboard .sidebar .location strong {
+  font-weight: 800;
+}
+
+#page-dashboard .login {
+  padding: 0px 80px;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  position: relative;
+
+  flex: 1;
+}
+
+#page-dashboard .login h3 {
+  font-weight: bold;
+  font-size: 32px;
+  line-height: 34px;
+
+  color: #5c8599;
+  width: 360px;
+
+  margin-bottom: 40px;
+}
+
+form.form-login {
+  width: 360px;
+}
+
+form.form-login .input-block + .input-block {
+  margin-top: 24px;
+}
+
+form.form-login .input-block label {
+  display: flex;
+  color: #8fa7b3;
+  margin-bottom: 8px;
+  line-height: 24px;
+}
+
+form.form-login .input-block input {
+  width: 100%;
+  background: #f5f8fa;
+  border: 1px solid #d3e2e5;
+  border-radius: 20px;
+  outline: none;
+  color: #5c8599;
+}
+
+form.form-login .input-block input {
+  height: 64px;
+  padding: 0 16px;
+}
+
+form.form-login .input-checkbox {
+  position: relative;
+}
+
+form.form-login .input-checkbox label {
+  color: #8fa7b3;
+}
+
+/* Base for label styling */
+[type="checkbox"]:not(:checked),
+[type="checkbox"]:checked {
+  position: absolute;
+  left: -9999px;
+}
+[type="checkbox"]:not(:checked) + label,
+[type="checkbox"]:checked + label {
+  position: relative;
+  padding-left: 1.95em;
+  cursor: pointer;
+}
+
+/* checkbox aspect */
+[type="checkbox"]:not(:checked) + label:before,
+[type="checkbox"]:checked + label:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+
+  background: #f5f8fa;
+
+  border: 1px solid #d3e2e5;
+
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+
+/* checked mark aspect */
+[type="checkbox"]:not(:checked) + label:after,
+[type="checkbox"]:checked + label:after {
+  content: url("../../images/check.svg");
+  position: absolute;
+  top: 0.2em;
+  left: 0.35em;
+  font-size: 1.2em;
+  line-height: 0.8;
+  color: #fff;
+  transition: all 0.2s;
+}
+/* checked mark aspect changes */
+[type="checkbox"]:not(:checked) + label:after {
+  opacity: 0;
+  transform: scale(0);
+}
+[type="checkbox"]:checked + label:after {
+  opacity: 1;
+  transform: scale(1);
+}
+[type="checkbox"]:checked + label:before {
+  background: #37c77f;
+
+  border: 2px solid #37c77f;
+}
+/* accessibility */
+[type="checkbox"]:checked:focus + label:before,
+[type="checkbox"]:not(:checked):focus + label:before {
+  border: 2px dotted #37c77f;
+}
+
+/* hover style just for information */
+label:hover:before {
+  border: 2px solid #37c77f !important;
+}
+
+form.form-login button.confirm-button {
+  margin-top: 40px;
+
+  width: 100%;
+  height: 64px;
+  border: 0;
+  cursor: pointer;
+  background: #3cdc8c;
+  border-radius: 20px;
+  color: #ffffff;
+  font-weight: 800;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  transition: background-color 0.2s;
+}
+
+form.form-login button.confirm-button.disabled {
+  opacity: 0.5;
+}
+
+form.form-login button.confirm-button svg {
+  margin-right: 16px;
+}
+
+form.form-login button.confirm-button:hover {
+  background: #36cf82;
+}
+
+#page-dashboard .infos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+#page-dashboard .infos .esqueci-senha {
+  font-size: 16px;
+  color: #8fa7b3;
+
+  text-decoration: none;
+}
+
+#page-dashboard .infos .esqueci-senha:hover {
+  text-decoration: underline;
+}
+
+#page-dashboard .login .go-back {
+  background: #ebf2f5;
+
+  width: 48px;
+  height: 48px;
+
+  border-radius: 16px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: absolute;
+  top: 40px;
+  right: 43px;
+}
