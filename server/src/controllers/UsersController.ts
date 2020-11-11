@@ -1,90 +1,155 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import orphanageView from '../views/orphanages_view';
+import userView from '../views/users_view';
 import * as Yup from 'yup';
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken'
+import * as nodemailer from 'nodemailer'
+import crypto from 'crypto'
 
-import Orphanage from '../models/Orphanage';
+import User from '../models/User';
+
 export default {
-    async index(request: Request, response: Response) {
-        const orphanagesRepository = getRepository(Orphanage);
-
-        const approved = true;
-        const orphanages = await orphanagesRepository.find({
-            where:{approved},
-            relations:['images']
-        });
-
-        response.json(orphanageView.renderMany(orphanages))
-    },
-
-    async show(request: Request, response: Response) {
-        const { id } = request.params
-        const orphanagesRepository = getRepository(Orphanage);
-        
-        const orphanage = await orphanagesRepository.findOneOrFail(id, {
-            relations:['images']
-        })
-
-        response.json(orphanageView.render(orphanage))
-    },
-
-    async create(request: Request, response: Response) {
-        const {
-            name,
-            latitude,
-            longitude,
-            about,
-            instructions,
-            opening_hours,
-            open_on_weekends,
-            whatsapp
-        } = request.body
+  async login(request: Request, response: Response) {
+    const { email, password } = request.body
+    const usersRepository = getRepository(User);        
     
-        const orphanagesRepository = getRepository(Orphanage);
+    const oneUser = await usersRepository.findOneOrFail({
+      where:{email}
+    });
 
-        const requestImages = request.files as Express.Multer.File[];
-        const images = requestImages.map(image => {
-            return {path: image.filename}
-        })
+    bcrypt.compare(password, oneUser.password, async function(err, result) {
+      if(result && !err) {
+        let idtoken = oneUser.id
+        oneUser.token = jwt.sign({ id:idtoken }, String(process.env.SECRET));
 
-        const data = {
-            name,
-            latitude,
-            longitude,
-            about,
-            instructions,
-            opening_hours,
-            open_on_weekends: open_on_weekends === 'true',
-            whatsapp,
-            approved:false,
-            images
-        };
+        await usersRepository.save(oneUser);
+        response.json(userView.render(oneUser))
+      }      
+    });
+  },
+
+  async reset(request: Request, response: Response) {
+    const { email } = request.body
+    const usersRepository = getRepository(User);
+    let token = '';
+    let message = {}
+    let statusNumber = 400;
+
+    const user = await usersRepository.findOneOrFail({
+      where:{email}
+    })
+
+    if(user) {
+      token = crypto.randomBytes(20).toString('hex');
+
+      user.token = token;
+      await usersRepository.save(user);
+
+      statusNumber = 200
+
+      message = {
+        email:email,
+        info:'Reset e-mail was sended successfuly, congrats!'
+      }
+
+      let testAccount = await nodemailer.createTestAccount();
+      let transporter = nodemailer.createTransport({
+        host: testAccount.smtp.host,
+        port: testAccount.smtp.port,
+        secure: testAccount.smtp.secure,
+        auth: {
+          user:testAccount.user,
+          pass:testAccount.pass,
+        },
+        tls: {
+          rejectUnauthorized:false
+        }
+      })
+
+      let mailOptions = {
+        from:"Happy Guarapari <no-replay@happy-guarapari.com>",
+        to:user.email,
+        subject:"Reset password from Happy Guarapari",
+        html:`<p>Olá, ${user.name}</p>
+        <p>Ficamos sabendo que você esqueceu sua senha, não tem problema estamos aqui para lhe ajudar com isso.</p>
+        <a href="http://localhost:3000/reset?token=${user.token}">Clique aqui para resetar sua senha</a>
+        <p>Caso o link não abra copie este e abra em uma nova aba: http://localhost:3000/reset?token=${user.token}</p>`
+      }
+
+      transporter.sendMail(mailOptions, (err, info) => {
+        if(!err) console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+      })
+    }
+
+    response.status(statusNumber).json(message)
+  },
+
+  async update(request: Request, response: Response) {
+    const { token } = request.params
+    const usersRepository = getRepository(User);
+
+    const user = await usersRepository.findOneOrFail({
+      where:{token}
+    })
+
+    if(user) {
+      const { newPassword } = request.body
+      const saltRounds = 10;
+
+      bcrypt.hash(newPassword, saltRounds, async (err, hash) => {
+        if(!err) {
+          let newToken = jwt.sign({ id:user.id }, String(process.env.SECRET), {
+            algorithm: 'RS256'
+          });
+    
+          user.password = hash;
+          user.token = newToken;
+          await usersRepository.save(user);
+        }
+      })
+    }
+  },
+
+  async create(request: Request, response: Response) {
+    const usersRepository = getRepository(User);
+
+    const {
+      name,
+      email,
+      password
+    } = request.body
+      
+    const saltRounds = 10;
+
+    const data = {
+      name,
+      email,
+      password,
+      token:'',
+    };
+
+    bcrypt.hash(password, saltRounds, async function(err, hash) {
+      if(!err) {
+        data.password = hash;
 
         const schema = Yup.object().shape({
-            name: Yup.string().required(),
-            latitude: Yup.number().required(),
-            longitude: Yup.number().required(),
-            about: Yup.string().required().max(300),
-            instructions: Yup.string().required(),
-            opening_hours: Yup.string().required(),
-            open_on_weekends: Yup.boolean().required(),
-            whatsapp: Yup.string(),
-            approved: Yup.boolean().required(),
-            images: Yup.array(
-                Yup.object().shape({
-                    path: Yup.string().required()
-                })
-            )
+          name: Yup.string().required(),
+          email: Yup.string().required(),
+          password: Yup.string().required(),
+          token: Yup.string(),
         })
         
         await schema.validate(data, {
-            abortEarly: false
+          abortEarly: false
         })
 
-        const orphanage = orphanagesRepository.create(data);
+        const user = usersRepository.create(data);
     
-        await orphanagesRepository.save(orphanage);
+        await usersRepository.save(user);
         
-        response.status(201).json(orphanage);
-    }
+        response.status(201).json(user);
+      }
+    });
+  }
 };

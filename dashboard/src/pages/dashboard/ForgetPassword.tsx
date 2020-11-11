@@ -2,25 +2,27 @@ import React, { FormEvent, useState } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
-import '../styles/pages/dashboard-esqueci.css'
-import logoImg from '../images/logoLogin.svg';
-import api from '../services/api'
+import '../../styles/pages/dashboard-esqueci.css'
+import logoImg from '../../images/logoLogin.svg';
+import {useAuth} from '../../contexts/auth'
 
-export default function DashboardForgetPassword() {
+export default function ForgetPassword() {
   const [user, setUser] = useState('');
+  const [warning, setWarning] = useState('');
+  const {reset} = useAuth();
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     
     if(user.length > 0) {
       
-      let data = {
-        params: {
-          user
-        }
+      let request = {
+        email:user
       }
 
-      api.get('esqueci', data)
+      const {status, data} = await reset(request)
+      if(status === 200) setWarning(data.info)
+      
     }
   }
 
@@ -35,7 +37,8 @@ export default function DashboardForgetPassword() {
         </div>
       </div>
       <div className="login">
-        <h3>Fazer login</h3>
+        <h3>Esqueci a senha</h3>
+        <p className="warning">Sua redefinição de senha será enviada para o e-mail cadastrado.</p>
         <form onSubmit={handleSubmit} className="form-login">
           <div className="input-block">
             <label htmlFor="email">E-mail</label>
@@ -46,6 +49,8 @@ export default function DashboardForgetPassword() {
             Confirmar
           </button>
         </form>
+
+        { warning.length > 0 && (<p className="warning success">{warning}</p>) }
 
         <Link to="/" className="go-back" >
           <FiArrowLeft size={26} color="#15C3D6" />              

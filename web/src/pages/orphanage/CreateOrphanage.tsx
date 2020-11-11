@@ -5,10 +5,10 @@ import { useHistory } from 'react-router-dom'
 
 import { FiPlus } from "react-icons/fi";
 
-import '../styles/pages/create-orphanage.css';
-import Sidebar from "../components/Sidebar";
-import mapIcon from "../utils/mapIcon";
-import api from "../services/api";
+import '../../styles/pages/create-orphanage.css';
+import Sidebar from "../../components/Sidebar";
+import mapIcon from "../../utils/mapIcon";
+import api from "../../services/api";
 
 export default function CreateOrphanage() {
   const history = useHistory()
@@ -19,6 +19,7 @@ export default function CreateOrphanage() {
   const [instructions, setInstructions] = useState('');
   const [opening_hours, setOpeningHours] = useState('');
   const [open_on_weekends, setOpenOnWeekends] = useState(true);
+  const [whatsapp, setWhatsapp] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([])
 
@@ -37,9 +38,9 @@ export default function CreateOrphanage() {
 
     const selectedImages = Array.from(event.target.files)
     
-    setImages(selectedImages);
+    setImages([...images, ...selectedImages]);
 
-    const selectedImagesPreview = selectedImages.map(image => {
+    const selectedImagesPreview = images.map(image => {
       return URL.createObjectURL(image)
     })
     setPreviewImages(selectedImagesPreview)
@@ -58,6 +59,7 @@ export default function CreateOrphanage() {
     data.append('instructions', instructions);
     data.append('opening_hours', opening_hours);    
     data.append('open_on_weekends', String(open_on_weekends));
+    data.append('whatsapp', whatsapp);    
 
     images.forEach(image => {
       data.append('images', image);
@@ -97,6 +99,11 @@ export default function CreateOrphanage() {
             <div className="input-block">
               <label htmlFor="about">Sobre <span>Máximo de 300 caracteres</span></label>
               <textarea id="about" maxLength={300} value={about} onChange={event => setAbout(event.target.value)} />
+            </div>
+
+            <div className="input-block">
+              <label htmlFor="whatsapp">Número de WhatsApp</label>
+              <input id="whatsapp" value={whatsapp} onChange={event => setWhatsapp(event.target.value)} />
             </div>
 
             <div className="input-block">

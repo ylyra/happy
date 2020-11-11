@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 
-import feitoImg from '../images/feito.svg';
-import '../styles/pages/success.css';
+import feitoImg from '../../images/feito.svg';
+import '../../styles/pages/success.css';
 
 export default function Success() {  
   return (

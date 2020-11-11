@@ -2,28 +2,26 @@ import React, { FormEvent, useState } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
-import '../styles/pages/dashboard-login.css'
-import logoImg from '../images/logoLogin.svg';
-import api from '../services/api'
+import '../../styles/pages/dashboard-login.css'
+import logoImg from '../../images/logoLogin.svg';
+import {useAuth} from '../../contexts/auth'
 
-export default function DashboardLogin() {
+export default function Login() {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
+  const {login} = useAuth();
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     
-    if(user.length > 0 && password.length > 0) {
-      
+    if(user.length > 0 && password.length > 0) {            
       let data = {
-        params: {
-          user,
-          password
-        }
+        email:user,
+        password
       }
 
-      api.get('login', data)
+      login(data, remember)
     }
   }
 
@@ -64,11 +62,11 @@ export default function DashboardLogin() {
               <label htmlFor="lembra"> Lembrar-me</label>
             </div>
 
-            <Link to="/dashboard/esqueci" className="esqueci-senha" >Esqueci minha senha</Link>
+            <Link to="/esqueci" className="esqueci-senha" >Esqueci minha senha</Link>
           </div>
 
           <button className={(user.length > 0 && password.length > 0) ? 'confirm-button' : 'confirm-button disabled'} type="submit">
-            Confirmar
+            Entrar
           </button>
         </form>
 

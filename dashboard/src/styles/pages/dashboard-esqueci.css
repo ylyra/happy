@@ -56,7 +56,26 @@
   color: #5c8599;
   width: 360px;
 
+  margin-bottom: 24px;
+}
+
+#page-dashboard .login p.warning {
+  width: 360px;
+
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 28px;
+
+  color: #5c8599;
+
   margin-bottom: 40px;
+}
+
+#page-dashboard .login p.warning.success {
+  margin-top: 20px;
+  margin-bottom: 0;
+  
+  color: #009d00;
 }
 
 form.form-login {

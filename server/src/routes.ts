@@ -12,9 +12,8 @@ routes.get('/orphanages', (request, response) => OrphanagesController.index(requ
 routes.get('/orphanages/:id', (request, response) => OrphanagesController.show(request, response));
 routes.post('/orphanages', upload.array('images'), (request, response) => OrphanagesController.create(request, response));
 
-routes.post('/login', (request, response) => UsersController.index(request, response));
-routes.post('/register', (request, response) => UsersController.index(request, response));
-routes.post('/reset', (request, response) => UsersController.index(request, response));
-routes.post('/update', (request, response) => UsersController.index(request, response));
+routes.post('/login', (request, response) => UsersController.login(request, response));
+routes.post('/reset', (request, response) => UsersController.reset(request, response));
+//routes.put('/update/:token', UsersController.update);
 
 export default routes;
